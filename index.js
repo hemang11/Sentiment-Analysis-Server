@@ -6,14 +6,15 @@ const Twit = require('twit');
 const bodyParser=require("body-parser");
 app.use(bodyParser.urlencoded({extended:true}));
 const notifier = require('node-notifier');
+require('dotenv').config()
 
 const Sentiment = require('sentiment');
 const sentiment = new Sentiment();
 
-const apikey = 'IXlCJhwejSyzfMBWTzbwjmS0f'
-const apiSecretKey = 'hmEs8iTgP2kzrSIFzP4UG32QWbsjD6Ew0U4v5YAzFKkq9fNwAE'
-const accessToken = '1325101026429427720-4h6SFyrAFS6vN5gVxZd1EyLxZhkMCI'
-const accessTokenSecret = 'fwbPdpf1a3684Asmoketv1sTE0pFKwqhOxKAmqvCYHYOm'
+const apikey = process.env.api_key;
+const apiSecretKey = process.env.api_secret;
+const accessToken = process.env.access_token
+const accessTokenSecret = process.env.access_token_secret;
 
 let T = new Twit({
   consumer_key:         apikey,
@@ -39,7 +40,7 @@ app.get('/sentiments',(req,res)=>{
     (async () => {
 
         //1. GET RECENT TWEETS
-        T.get('search/tweets', { q: `#${hashtag} since:2020-04-15`, count: 5 }, function(err, data, response) {
+        T.get('search/tweets', { q: `#${hashtag} since:2020-04-15`, count: 50 }, function(err, data, response) {
           const tweets = data.statuses
           .filter(tweet => tweet.metadata.iso_language_code =='en')
           .map(tweet => tweet.text)
@@ -123,7 +124,8 @@ app.get('/sentiments',(req,res)=>{
     })();
 });
 
-app.listen(4000,()=>{
+const PORT = process.env.PORT || 4000
+app.listen(PORT,()=>{
     console.log('Server Started');
 })
 
